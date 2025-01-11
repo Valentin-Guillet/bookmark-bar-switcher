@@ -21,6 +21,24 @@ export async function install() {
 }
 
 /**
+ * Detect the bookmark bar currently loaded and set the local storage
+ * variable to it.
+ */
+export async function initialize() {
+    const customDirectoryId = await getCustomDirectoryId();
+    const bookmarks = await chrome.bookmarks.getChildren(customDirectoryId);
+    const bookmarksBars = bookmarks.filter((bar) => !bar.url);
+
+    if (bookmarksBars.length === 0) {
+        return;
+    }
+
+    const bookmarkChildren = await Promise.all(bookmarksBars.map((bar) => chrome.bookmarks.getChildren(bar.id)));
+    const activeBar = bookmarksBars[bookmarkChildren.findIndex((children) => children.length === 0)];
+    await updateActiveBar(activeBar);
+}
+
+/**
  * Exchange current bookmark bar with the selected bookmark bar by moving
  * bookmarks from the current bookmark bar to "Other Bookmarks" and the bookmarks
  * from the selected bookmarks bar to the "Bookmarks Bar".

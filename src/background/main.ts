@@ -6,10 +6,11 @@ import {
     handleWindowCreate,
     handleWorkspaceSwitch,
 } from '~/background/handlers.ts';
-import { install } from '~/background/service.ts';
+import { install, initialize } from '~/background/service.ts';
 import { isOperaBrowser } from './util.ts';
 
 chrome.runtime.onInstalled.addListener(install);
+chrome.runtime.onStartup.addListener(initialize)
 chrome.bookmarks.onChanged.addListener(handleChange);
 chrome.bookmarks.onRemoved.addListener(handleRemove);
 chrome.bookmarks.onMoved.addListener(handleMove);
