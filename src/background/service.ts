@@ -25,6 +25,8 @@ export async function install() {
  * variable to it.
  */
 export async function initialize() {
+    const savedActiveBar = await getActiveBar();
+
     const customDirectoryId = await getCustomDirectoryId();
     const bookmarks = await chrome.bookmarks.getChildren(customDirectoryId);
     const bookmarksBars = bookmarks.filter((bar) => !bar.url);
@@ -34,8 +36,8 @@ export async function initialize() {
     }
 
     const bookmarkChildren = await Promise.all(bookmarksBars.map((bar) => chrome.bookmarks.getChildren(bar.id)));
-    const activeBar = bookmarksBars[bookmarkChildren.findIndex((children) => children.length === 0)];
-    await updateActiveBar(activeBar);
+    const trueActiveBar = bookmarksBars[bookmarkChildren.findIndex((children) => children.length === 0)];
+    await exchangeBars(savedActiveBar.id, trueActiveBar.id);
 }
 
 /**
